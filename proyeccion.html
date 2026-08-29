@@ -20,8 +20,8 @@
         .main-layout { display: flex; flex: 1; min-height: calc(100vh - 65px); width: 100%; }
         
         /* Pantalla Gigante Principal */
-        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; }
-        .stage img, .stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; overflow: hidden; }
+        .stage img, .stage video { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
         .stage-text { font-size: 2.2rem; text-align: center; padding: 30px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
         .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); z-index: 10; }
 
@@ -31,7 +31,7 @@
         
         .mini-card { background: #22022b; border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .mini-screen { width: 100%; height: 120px; background: #000; border-radius: 6px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; margin-bottom: 6px; }
-        .mini-screen img, .mini-screen video { width: 100%; height: 100%; object-fit: cover; }
+        .mini-screen img, .mini-screen video { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
         .mini-screen span { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
 
         .playback-buttons { display: flex; gap: 6px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
@@ -229,11 +229,11 @@
                 htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
             } else if (item.tipo === 'VIDEO') {
-                htmlContent = `<video src="${item.url}" autoplay controls muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>`;
-                miniHtml = `<video src="${item.url}" muted style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+                htmlContent = `<video src="${item.url}" autoplay controls muted playsinline style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;"></video>`;
+                miniHtml = `<video src="${item.url}" muted style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;"></video>`;
             } else {
-                htmlContent = `<img src="${item.url}" alt="Foto">`;
-                miniHtml = `<img src="${item.url}" alt="Miniatura">`;
+                htmlContent = `<img src="${item.url}" alt="Foto" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">`;
+                miniHtml = `<img src="${item.url}" alt="Miniatura" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">`;
             }
 
             stage.innerHTML = htmlContent + `<div class="author-tag">📷 ${item.autor}</div>`;
@@ -254,9 +254,9 @@
                 if (next.tipo === 'TEXTO') {
                     miniPreview.innerHTML = `<span style="font-size:0.7rem; padding:5px;">${next.detalle}</span>`;
                 } else if (next.tipo === 'VIDEO') {
-                    miniPreview.innerHTML = `<video src="${next.url}" muted style="width: 100%; height: 100%; object-fit: cover;"></video>`;
+                    miniPreview.innerHTML = `<video src="${next.url}" muted style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;"></video>`;
                 } else {
-                    miniPreview.innerHTML = `<img src="${next.url}">`;
+                    miniPreview.innerHTML = `<img src="${next.url}" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">`;
                 }
             } else {
                 miniPreview.innerHTML = `<span>No hay pendientes</span>`;
