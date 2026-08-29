@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALBUM POV EN VIVO - Proyección</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Exo 2', sans-serif; }
+        body { background: #14051c; color: #fff; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        header { background: #22022b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        h1 { font-size: 1.2rem; color: #00d4ff; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .controls-bar { display: flex; gap: 15px; align-items: center; font-size: 0.85rem; }
+        .controls-bar select, .controls-bar button { padding: 8px 15px; border-radius: 10px; border: none; background: #a83bf6; color: #fff; font-weight: bold; cursor: pointer; }
+        .controls-bar select { background: #14051c; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+
+        .main-layout { display: flex; flex: 1; height: calc(100vh - 65px); }
+        
+        /* Pantalla Gigante Principal */
+        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; }
+        .stage img, .stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .stage-text { font-size: 2.5rem; text-align: center; padding: 40px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 1rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+
+        /* Panel de Control / Operador (Doble Vista) */
+        .operator-panel { flex: 1; background: #1c0626; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .panel-section-title { font-size: 0.8rem; text-transform: uppercase; color: #d0c0e0; letter-spacing: 1px; margin-bottom: 5px; }
+        
+        .mini-card { background: #22022b; border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .mini-screen { width: 100%; height: 140px; background: #000; border-radius: 8px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; margin-bottom: 8px; }
+        .mini-screen img, .mini-screen video { width: 100%; height: 100%; object-fit: cover; }
+        .mini-screen span { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+        .moderation-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-approve { flex: 1; background: #2bb84b; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-reject { flex: 1; background: #d93838; color: #fff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .queue-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .queue-item { background: #14051c; padding: 8px; border-radius: 8px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ALBUM POV - Proyección en Vivo</h1>
+        <div class="controls-bar">
+            <label><input type="checkbox" id="checkModerar" onchange="toggleModeracion()"> Modo Moderación</label>
+            <span>Velocidad:</span>
+            <select id="selectVelocidad" onchange="cambiarVelocidad()">
+                <option value="6000">6 segundos</option>
+                <option value="8000" selected>8 segundos</option>
+                <option value="12000">12 segundos</option>
+            </select>
+            <button id="btnPlayPause" onclick="togglePlayPause()">PAUSAR</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- PANTALLA GIGANTE -->
+        <div class="stage" id="stageContainer">
+            <span style="color: rgba(255,255,255,0.3); font-size: 1.5rem;">Esperando contenido...</span>
+        </div>
+
+        <!-- PANEL DE DOBLE VISTA / OPERADOR -->
+        <div class="operator-panel">
+            <div class="mini-card">
+                <div class="panel-section-title">Lo que está al aire (En vivo)</div>
+                <div class="mini-screen" id="miniCurrent">
+                    <span>Sin señal</span>
+                </div>
+                <div id="currentAuthorInfo" style="font-size: 0.75rem; color: #00d4ff;">Autor: -</div>
+            </div>
+
+            <div class="mini-card" id="previewCard" style="display: none;">
+                <div class="panel-section-title">Vista Previa (Siguiente)</div>
+                <div class="mini-screen" id="miniPreview">
+                    <span>Sin pendientes</span>
+                </div>
+                <div id="previewAuthorInfo" style="font-size: 0.75rem; color: #fffd8d;">Autor: -</div>
+                <div class="moderation-actions">
+                    <button class="btn-approve" onclick="moderarActual('APROBADO')">Aprobar</button>
+                    <button class="btn-reject" onclick="moderarActual('RECHAZADO')">Rechazar</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel-section-title">Cola de elementos</div>
+                <div class="queue-list" id="queueList">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PEGA AQUÍ LA URL DE TU WEB APP DE APPS SCRIPT
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5cRu4QOgrVq--Wp6a_u4N3sbe6Nebsujchjg0zoyl_-ypu5VS0Xn1LnGna02w0w7NwA/exec";
+
+        let listaContenidos = [];
+        let currentIndex = 0;
+        let isPlaying = true;
+        let modoModeracion = false;
+        let intervaloSlides = 8000;
+        let timer = null;
+
+        function toggleModeracion() {
+            modoModeracion = document.getElementById('checkModerar').checked;
+            document.getElementById('previewCard').style.display = modoModeracion ? 'block' : 'none';
+            sincronizarContenidos();
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            document.getElementById('btnPlayPause').innerText = isPlaying ? "PAUSAR" : "REANUDAR";
+            if (isPlaying) iniciarLoop();
+            else clearInterval(timer);
+        }
+
+        function cambiarVelocidad() {
+            intervaloSlides = parseInt(document.getElementById('selectVelocidad').value);
+            if (isPlaying) iniciarLoop();
+        }
+
+        function fetchContenidos() {
+            fetch(`${WEB_APP_URL}?accion=obtenerContenidos`)
+                .then(res => res.json())
+                .then(data => {
+                    listaContenidos = data;
+                    actualizarColaUI();
+                    if (currentIndex >= listaContenidos.length) currentIndex = 0;
+                })
+                .catch(err => console.error("Error al obtener contenidos", err));
+        }
+
+        // Consultar nuevos datos cada 5 segundos
+        setInterval(fetchContenidos, 5000);
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchContenidos();
+            iniciarLoop();
+        });
+
+        function iniciarLoop() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (isPlaying && listaContenidos.length > 0) {
+                    avanzarSlide();
+                }
+            }, intervaloSlides);
+        }
+
+        function avanzarSlide() {
+            let filtrados = obtenerElementosAProyectar();
+            if (filtrados.length === 0) return;
+
+            currentIndex = (currentIndex + 1) % filtrados.length;
+            renderizarPantalla(filtrados[currentIndex]);
+        }
+
+        function obtenerElementosAProyectar() {
+            if (modoModeracion) {
+                return listaContenidos.filter(item => item.estado === 'APROBADO');
+            } else {
+                return listaContenidos; // Sin moderación, todos pasan
+            }
+        }
+
+        function renderizarPantalla(item) {
+            const stage = document.getElementById('stageContainer');
+            const miniCurrent = document.getElementById('miniCurrent');
+            if (!item) return;
+
+            document.getElementById('currentAuthorInfo').innerText = `Autor: ${item.autor}`;
+
+            let htmlContent = '';
+            let miniHtml = '';
+
+            if (item.tipo === 'TEXTO') {
+                htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
+                miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
+            } else if (item.tipo === 'VIDEO') {
+                htmlContent = `<video src="${item.url}" autoplay muted controls></video>`;
+                miniHtml = `<video src="${item.url}"></video>`;
+            } else {
+                htmlContent = `<img src="${item.url}" alt="Foto">`;
+                miniHtml = `<img src="${item.url}" alt="Miniatura">`;
+            }
+
+            stage.innerHTML = htmlContent + `<div class="author-tag">📷 ${item.autor}</div>`;
+            miniCurrent.innerHTML = miniHtml;
+
+            if (modoModeracion) {
+                actualizarVistaPrevia();
+            }
+        }
+
+        function actualizarVistaPrevia() {
+            let pendientes = listaContenidos.filter(item => item.estado === 'PENDIENTE');
+            const miniPreview = document.getElementById('miniPreview');
+            const previewInfo = document.getElementById('previewAuthorInfo');
+
+            if (pendientes.length > 0) {
+                let next = pendientes[0];
+                previewInfo.innerText = `Autor: ${next.autor} (${next.tipo})`;
+                if (next.tipo === 'TEXTO') {
+                    miniPreview.innerHTML = `<span style="font-size:0.7rem; padding:5px;">${next.detalle}</span>`;
+                } else if (next.tipo === 'VIDEO') {
+                    miniPreview.innerHTML = `<video src="${next.url}"></video>`;
+                } else {
+                    miniPreview.innerHTML = `<img src="${next.url}">`;
+                }
+            } else {
+                miniPreview.innerHTML = `<span>No hay pendientes</span>`;
+                previewInfo.innerText = `Autor: -`;
+            }
+        }
+
+        function moderarActual(nuevoEstado) {
+            let pendientes = listaContenidos.filter(item => item.estado === 'PENDIENTE');
+            if (pendientes.length === 0) return;
+            let target = pendientes[0];
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    tipo: "moderar",
+                    rowIndex: target.rowIndex,
+                    nuevoEstado: nuevoEstado
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                fetchContenidos();
+            });
+        }
+
+        function actualizarColaUI() {
+            const queueList = document.getElementById('queueList');
+            queueList.innerHTML = '';
+            listaContenidos.slice(-5).reverse().forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'queue-item';
+                div.innerHTML = `<span>${item.autor} (${item.tipo})</span> <span style="color:${item.estado==='APROBADO'?'#2bb84b':item.estado==='RECHAZADO'?'#d93838':'#fffd8d'}">${item.estado}</span>`;
+                queueList.appendChild(div);
+            });
+            if (modoModeracion) actualizarVistaPrevia();
+        }
+    </script>
+</body>
+</html>
