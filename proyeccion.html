@@ -23,7 +23,7 @@
         .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; }
         .stage img, .stage video { max-width: 100%; max-height: 100%; object-fit: contain; }
         .stage-text { font-size: 2.2rem; text-align: center; padding: 30px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
-        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); z-index: 10; }
 
         /* Panel de Control / Operador */
         .operator-panel { flex: 1; background: #1c0626; padding: 15px; display: flex; flex-direction: column; gap: 12px; min-width: 300px; overflow-y: auto; }
@@ -229,8 +229,8 @@
                 htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
             } else if (item.tipo === 'VIDEO') {
-                htmlContent = `<video src="${item.url}" autoplay muted controls></video>`;
-                miniHtml = `<video src="${item.url}"></video>`;
+                htmlContent = `<video src="${item.url}" autoplay controls muted playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>`;
+                miniHtml = `<video src="${item.url}" muted style="width: 100%; height: 100%; object-fit: cover;"></video>`;
             } else {
                 htmlContent = `<img src="${item.url}" alt="Foto">`;
                 miniHtml = `<img src="${item.url}" alt="Miniatura">`;
@@ -254,7 +254,7 @@
                 if (next.tipo === 'TEXTO') {
                     miniPreview.innerHTML = `<span style="font-size:0.7rem; padding:5px;">${next.detalle}</span>`;
                 } else if (next.tipo === 'VIDEO') {
-                    miniPreview.innerHTML = `<video src="${next.url}"></video>`;
+                    miniPreview.innerHTML = `<video src="${next.url}" muted style="width: 100%; height: 100%; object-fit: cover;"></video>`;
                 } else {
                     miniPreview.innerHTML = `<img src="${next.url}">`;
                 }
