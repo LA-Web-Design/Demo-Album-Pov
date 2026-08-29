@@ -53,10 +53,8 @@
     </div>
 
     <script>
-        // PEGA AQUÍ LA MISMA URL DE TU APPS SCRIPT QUE USAS EN EL INDEX
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5cRu4QOgrVq--Wp6a_u4N3sbe6Nebsujchjg0zoyl_-ypu5VS0Xn1LnGna02w0w7NwA/exec";
 
-        // Cargar configuración inicial al abrir la página
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputUrlAppScript').value = WEB_APP_URL;
             
@@ -87,7 +85,7 @@
 
         function guardar() {
             const modo = document.getElementById('selectModo').value;
-            const validarLista = document.getElementById('checkValidar'].checked;
+            const validarLista = document.getElementById('checkValidar').checked;
             const sheetInvitadosId = document.getElementById('inputSheetInvitados').value.trim();
             const fotos = document.getElementById('inputFotos').value.trim();
             const videos = document.getElementById('inputVideos').value.trim();
@@ -96,7 +94,6 @@
             
             document.getElementById('msg').innerText = "Guardando...";
 
-            // Como guardar configuración usa Google Script nativo, lo mandamos por POST al backend
             fetch(WEB_APP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
