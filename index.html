@@ -153,7 +153,7 @@
     let validarListaGlobal = false;
     let archivosAcumulados = [];
     let nombreUsuario = '';
-    const LIMITE_MAXIMO = 5; // Límite seguro de archivos por envío en lote
+    const LIMITE_MAXIMO = 5;
 
     const cameraInput = document.getElementById('cameraInput');
     const galleryInput = document.getElementById('galleryInput');
@@ -251,7 +251,6 @@
             submitBtn.setAttribute('disabled', 'true');
         }
 
-        // Si llega al límite de 5, apaga visualmente los selectores
         if (archivosAcumulados.length >= LIMITE_MAXIMO) {
             document.getElementById('labelCamera').classList.add('disabled-mode');
             document.getElementById('labelVideo').classList.add('disabled-mode');
