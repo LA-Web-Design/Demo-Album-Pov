@@ -151,6 +151,10 @@
             sincronizarContenidos();
         }
 
+        function sincronizarContenidos() {
+            fetchContenidos();
+        }
+
         function fijarReproduccion(estado) {
             isPlaying = estado;
             actualizarBotoneraPlayPause();
@@ -179,16 +183,16 @@
         }
 
         function fetchContenidos() {
-            fetch(`${WEB_APP_URL}?accion=obtenerContenidos`)
+            fetch(`${WEB_APP_URL}?accion=obtenerContenido`)
                 .then(res => res.json())
                 .then(data => {
                     listaContenidos = data;
                     actualizarColaUI();
-                    if (listaContenidos.length > 0 && currentIndex === 0 && document.getElementById('stageContainer').innerHTML.includes('Cargando')) {
+                    if (listaContenidos.length > 0 && (currentIndex === 0 || currentIndex >= listaContenidos.length) && document.getElementById('stageContainer').innerHTML.includes('Cargando')) {
                         renderizarPantalla(listaContenidos[0]);
                     }
                 })
-                .catch(err => console.error("Error al obtener contenidos", err));
+                .catch(err => console.error("Error al obtener contenido", err));
         }
 
         setInterval(fetchContenidos, 5000);
