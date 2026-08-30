@@ -19,13 +19,13 @@
 
         .main-layout { display: flex; flex: 1; min-height: calc(100vh - 65px); width: 100%; }
         
-        /* Pantalla Gigante Principal con contenedor estricto para evitar desbordes */
-        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; overflow: hidden; }
+        /* Pantalla Gigante Principal con contenedor estricto y cursor interactivo */
+        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; overflow: hidden; cursor: pointer; }
         
         .media-container {
             position: relative;
-            width: 90%;
-            height: 85%;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,16 +34,14 @@
         }
 
         .media-container img, .media-container video {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             display: block;
         }
 
         .stage-text { font-size: 2.2rem; text-align: center; padding: 30px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
-        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); z-index: 10; }
+        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); z-index: 10; pointer-events: none; }
 
         /* Panel de Control / Operador */
         .operator-panel { flex: 1; background: #1c0626; padding: 15px; display: flex; flex-direction: column; gap: 12px; min-width: 300px; overflow-y: auto; }
@@ -51,7 +49,7 @@
         
         .mini-card { background: #22022b; border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .mini-screen { width: 100%; height: 120px; background: #000; border-radius: 6px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; margin-bottom: 6px; }
-        .mini-screen img, .mini-screen video { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+        .mini-screen img, .mini-screen video { width: 100%; height: 100%; object-fit: contain; }
         .mini-screen span { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
 
         .playback-buttons { display: flex; gap: 6px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
@@ -90,8 +88,8 @@
     </header>
 
     <div class="main-layout">
-        <!-- PANTALLA GIGANTE -->
-        <div class="stage" id="stageContainer">
+        <!-- PANTALLA GIGANTE CON EVENTO TÁCTIL PARA AVANZAR -->
+        <div class="stage" id="stageContainer" onclick="avanzarSlideManual()">
             <span style="color: rgba(255,255,255,0.3); font-size: 1.2rem;">Cargando contenido...</span>
         </div>
 
@@ -101,10 +99,10 @@
             <div class="mini-card" style="padding: 8px;">
                 <div class="panel-section-title">Controles de Reproducción</div>
                 <div class="playback-buttons">
-                    <button class="btn-ctrl" onclick="retrocederSlide()" title="Anterior">⏮ Anterior</button>
-                    <button class="btn-ctrl" id="btnPlay" onclick="fijarReproduccion(true)" title="Reproducir">▶ Reproducir</button>
-                    <button class="btn-ctrl" id="btnPause" onclick="fijarReproduccion(false)" title="Pausar">⏸ Pausar</button>
-                    <button class="btn-ctrl" onclick="avanzarSlideManual()" title="Siguiente">Siguiente ⏭</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">⏮ Anterior</button>
+                    <button class="btn-ctrl" id="btnPlay" onclick="event.stopPropagation(); fijarReproduccion(true)" title="Reproducir">▶ Reproducir</button>
+                    <button class="btn-ctrl" id="btnPause" onclick="event.stopPropagation(); fijarReproduccion(false)" title="Pausar">⏸ Pausar</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ⏭</button>
                 </div>
             </div>
 
@@ -123,8 +121,8 @@
                 </div>
                 <div id="previewAuthorInfo" style="font-size: 0.75rem; color: #fffd8d;">Autor: -</div>
                 <div class="moderation-actions">
-                    <button class="btn-approve" onclick="moderarActual('APROBADO')">Aprobar</button>
-                    <button class="btn-reject" onclick="moderarActual('RECHAZADO')">Rechazar</button>
+                    <button class="btn-approve" onclick="event.stopPropagation(); moderarActual('APROBADO')">Aprobar</button>
+                    <button class="btn-reject" onclick="event.stopPropagation(); moderarActual('RECHAZADO')">Rechazar</button>
                 </div>
             </div>
 
@@ -249,15 +247,24 @@
                 htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
             } else if (item.tipo === 'VIDEO') {
-                htmlContent = `<div class="media-container"><video src="${item.url}" autoplay controls muted playsinline></video></div>`;
-                miniHtml = `<video src="${item.url}" muted></video>`;
+                // Forzamos tamaño completo al 100% y autoplay con manejo seguro de promesas para evitar que se cuelguen
+                htmlContent = `<div class="media-container"><video src="${item.url}" autoplay muted playsinline style="width:100%; height:100%; object-fit:contain;" onended="avanzarSlideManual()"></video></div>`;
+                miniHtml = `<video src="${item.url}" muted style="width:100%; height:100%; object-fit:contain;"></video>`;
             } else {
-                htmlContent = `<div class="media-container"><img src="${item.url}" alt="Foto"></div>`;
-                miniHtml = `<img src="${item.url}" alt="Miniatura">`;
+                htmlContent = `<div class="media-container"><img src="${item.url}" alt="Foto" style="width:100%; height:100%; object-fit:contain;"></div>`;
+                miniHtml = `<img src="${item.url}" alt="Miniatura" style="width:100%; height:100%; object-fit:contain;">`;
             }
 
             stage.innerHTML = htmlContent + `<div class="author-tag">📷 ${item.autor}</div>`;
             miniCurrent.innerHTML = miniHtml;
+
+            // Si es un video, asegurarnos mediante código que comience a reproducirse por si el navegador exige el comando explícito
+            if (item.tipo === 'VIDEO') {
+                const videoElement = stage.querySelector('video');
+                if (videoElement) {
+                    videoElement.play().catch(e => console.log("Autoplay prevenido por navegador, requiere interacción:", e));
+                }
+            }
 
             actualizarColaUI();
             if (modoModeracion) actualizarVistaPrevia();
@@ -274,9 +281,9 @@
                 if (next.tipo === 'TEXTO') {
                     miniPreview.innerHTML = `<span style="font-size:0.7rem; padding:5px;">${next.detalle}</span>`;
                 } else if (next.tipo === 'VIDEO') {
-                    miniPreview.innerHTML = `<video src="${next.url}" muted></video>`;
+                    miniPreview.innerHTML = `<video src="${next.url}" muted style="width:100%; height:100%; object-fit:contain;"></video>`;
                 } else {
-                    miniPreview.innerHTML = `<img src="${next.url}">`;
+                    miniPreview.innerHTML = `<img src="${next.url}" style="width:100%; height:100%; object-fit:contain;">`;
                 }
             } else {
                 miniPreview.innerHTML = `<span>No hay pendientes</span>`;
