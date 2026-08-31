@@ -1,524 +1,768 @@
+CODIGO INDEX 20260828 1200 EN GITHUB
+ALBUM POV EN VIVO INVITADO
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALBUM POV EN VIVO - Proyección</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ALBUM POV EN VIVO</title>
+    <!-- Tipografía Exo 2 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Exo 2', sans-serif; }
-        body { background: #14051c; color: #fff; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-        
-        header { background: #22022b; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 10px; }
-        h1 { font-size: 1.1rem; color: #00d4ff; letter-spacing: 1px; text-transform: uppercase; }
-        
-        .controls-bar { display: flex; gap: 8px; align-items: center; font-size: 0.8rem; flex-wrap: wrap; }
-        .controls-bar select, .controls-bar button { padding: 6px 10px; border-radius: 8px; border: none; background: #a83bf6; color: #fff; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .controls-bar button:hover { background: #bc62f8; }
-        .controls-bar select { background: #14051c; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
 
-        .main-layout { display: flex; flex: 1; min-height: calc(100vh - 65px); width: 100%; transition: all 0.3s ease; }
-        
-        /* Pantalla Gigante Principal */
-        .stage { flex: 3; background: #000; display: flex; justify-content: center; align-items: center; position: relative; border-right: 2px solid #22022b; min-height: 50vh; overflow: hidden; cursor: pointer; transition: flex 0.3s ease; }
-        
-        .media-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
-            overflow: hidden;
+            padding: 20px;
+            background-color: #1D89F5; 
+            background-image: url('tapiz.jpg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
         }
 
-        .media-container img, .media-container video {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            display: block;
-        }
-
-        .stage-text { font-size: 2.2rem; text-align: center; padding: 30px; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.8); z-index: 2; }
-        .author-tag { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); z-index: 10; pointer-events: none; }
-
-        /* Botón flotante minimalista para alternar modo presentación limpia */
-        .btn-fullscreen-toggle {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(34, 2, 43, 0.85);
-            color: #00d4ff;
-            border: 1px solid rgba(0,212,255,0.4);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 20;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .btn-fullscreen-toggle:hover { background: #a83bf6; color: #fff; }
-
-        /* Panel de Control / Operador */
-        .operator-panel { 
-            flex: 1; 
-            background: #1c0626; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            gap: 12px; 
-            min-width: 300px; 
-            overflow-y: auto; 
-            transition: all 0.3s ease; 
-        }
-        .panel-section-title { font-size: 0.75rem; text-transform: uppercase; color: #d0c0e0; letter-spacing: 1px; margin-bottom: 4px; }
-        
-        .mini-card { background: #22022b; border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .mini-screen { width: 100%; height: 120px; background: #000; border-radius: 6px; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; margin-bottom: 6px; }
-        .mini-screen img, .mini-screen video { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .mini-screen span { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
-
-        /* Estructura de la Botonera Simétrica */
-        .playback-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-        .playback-row { display: flex; gap: 6px; justify-content: center; }
-        
-        .btn-ctrl { 
-            flex: 1; 
-            color: #fff; 
-            border: 1px solid rgba(0,212,255,0.3); 
-            padding: 8px 5px; 
-            border-radius: 6px; 
-            font-size: 0.75rem; 
-            font-weight: bold; 
-            cursor: pointer; 
+        .card {
+            width: 100%;
+            max-width: 380px;
+            padding: 30px 22px 20px 22px;
+            border-radius: 28px;
+            background-color: #22022b !important;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2'/%3E%3C/svg%3E");
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.85),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            transition: background 0.2s, box-shadow 0.2s, border 0.2s;
-            background: #3c095c;
-        }
-        .btn-ctrl:hover { background: #5a189a; }
-        
-        /* Jerarquía de Estados de Play/Pausa (Nunca grises) */
-        .btn-ctrl.state-play { background: #2bb84b; border-color: #4ce66d; }
-        .btn-ctrl.state-pause { background: #b8972b; border-color: #ffd700; color: #fff; }
-
-        /* Botón Stop con feedback visual potente al activarse */
-        .btn-ctrl.btn-stop-base { background: #d93838; border-color: #ff5c5c; }
-        .btn-ctrl.state-stop-active { 
-            background: #ff1e1e !important; 
-            border-color: #ffffff !important; 
-            box-shadow: 0 0 12px rgba(255, 30, 30, 0.9); 
+            position: relative;
         }
 
-        .moderation-actions { display: flex; gap: 8px; margin-top: 8px; }
-        .btn-approve { flex: 1; background: #2bb84b; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        .btn-reject { flex: 1; background: #d93838; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        
-        .queue-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; max-height: 180px; overflow-y: auto; }
-        .queue-item { background: #14051c; padding: 8px; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .queue-item.active-item { border-color: #00d4ff; background: #240833; }
+        h2 {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
 
-        /* Footer integrado y alineado al fondo */
-        .footer-divider { width: 100%; height: 2px; background: rgba(0, 0, 0, 0.8); margin: 15px 0 10px 0; }
-        .footer-text { color: #00d4ff; font-size: 0.7rem; text-align: center; line-height: 1.45; opacity: 0.9; }
+        .versions-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 14px;
+            width: 100%;
+        }
 
-        @media (max-width: 900px) {
-            .main-layout { flex-direction: column; }
-            .stage { min-height: 45vh; border-right: none; border-bottom: 2px solid #22022b; }
-            .operator-panel { width: 100%; min-width: 100%; }
+        .versions-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .version-pill {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .version-pill.active {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.35);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        p.subtitle {
+            color: #d1b4e8;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .input-container {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .input-autor {
+            width: 100%;
+            height: 48px;
+            background-color: #14051c !important;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 0 18px;
+            color: #00d4ff !important;
+            font-size: 0.95rem;
+            font-weight: 400;
+            outline: none;
+            text-align: center;
+            box-shadow: 
+                inset 0 6px 10px rgba(0, 0, 0, 0.95),
+                inset 0 -2px 5px rgba(255, 255, 255, 0.15),
+                0 1px 2px rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .input-autor::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 400;
+        }
+
+        .input-help {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.72rem;
+            margin-bottom: 18px;
+            display: block;
+            font-weight: 400;
+        }
+
+        .fixed-header {
+            background: #14051c;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 10px 15px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            font-weight: 400;
+            color: #00d4ff;
+            font-size: 0.95rem;
+            text-align: center;
+            letter-spacing: 0.5px;
+            width: 100%;
+            box-shadow: 
+                inset 0 6px 10px rgba(0, 0, 0, 0.95),
+                inset 0 -2px 5px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-action {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            height: 50px;
+            padding: 0 20px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: transform 0.1s ease, filter 0.1s ease, background 0.3s ease;
+            margin-bottom: 15px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-action span { 
+            text-align: center;
+            width: 100%;
+            margin-right: 20px;
+        }
+
+        .btn-action svg { 
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-action:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-action:active:not(:disabled) { transform: translateY(2px); }
+
+        .btn-continuar {
+            justify-content: center;
+            background: linear-gradient(180deg, #1a0724 0%, #2f1340 15%, #200a2d 35%, #100318 75%, #07010b 100%);
+            color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.08), inset 0 -4px 6px rgba(0, 0, 0, 0.7);
+            cursor: not-allowed;
+        }
+
+        .btn-continuar span { margin-right: 0; }
+
+        .btn-continuar.active {
+            background: linear-gradient(180deg, #7a22b8 0%, #ca78ff 15%, #a83bf6 30%, #6c1cb0 70%, #380859 100%);
+            color: #ffffff;
+            cursor: pointer;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 6px 18px rgba(168, 59, 246, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -5px 7px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-select {
+            background: linear-gradient(180deg, #0f5ba6 0%, #71bdff 15%, #1D89F5 30%, #105db0 70%, #05254a 100%);
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -5px 7px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-submit {
+            background: linear-gradient(180deg, #135d23 0%, #75f992 15%, #2bb84b 30%, #1b8533 70%, #083312 100%);
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -5px 7px rgba(0, 0, 0, 0.8);
+            display: flex !important; 
+        }
+
+        .btn-submit:disabled {
+            background: linear-gradient(180deg, #111a13 0%, #223826 15%, #162419 30%, #0e1710 70%, #070c08 100%) !important;
+            color: rgba(255, 255, 255, 0.25) !important;
+            text-shadow: none !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 -4px 6px rgba(0, 0, 0, 0.7) !important;
+            cursor: not-allowed !important;
+            pointer-events: none;
+        }
+
+        .btn-reset {
+            background: linear-gradient(180deg, #135d23 0%, #75f992 15%, #2bb84b 30%, #1b8533 70%, #083312 100%);
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -5px 7px rgba(0, 0, 0, 0.8);
+            display: none !important; 
+        }
+
+        #counter-badge {
+            font-size: 0.88rem;
+            color: #75f992;
+            font-weight: 600;
+            margin-bottom: 12px;
+            min-height: 1.2em;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        input[type="file"] { display: none; }
+
+        #status-msg {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 1.2em;
+            width: 100%;
+        }
+
+        .hidden { display: none !important; }
+
+        .footer-divider {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
+        }
+
+        .footer-text {
+            color: #00d4ff;
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 1.45;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #22022b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 85%;
+            max-width: 310px;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-title {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-body {
+            color: #d0c0e0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 18px;
+            font-weight: 400;
+        }
+
+        .modal-btn {
+            background: #00d4ff;
+            color: #0b1a2d;
+            font-weight: 800;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 212, 255, 0.3);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>ALBUM POV - Proyección</h1>
-        <div class="controls-bar">
-            <label style="font-size: 0.75rem;"><input type="checkbox" id="checkModerar" onchange="toggleModeracion()"> Moderar</label>
-            <span>Velocidad:</span>
-            <select id="selectVelocidad" onchange="cambiarVelocidad()">
-                <option value="6000">6s</option>
-                <option value="8000" selected>8s</option>
-                <option value="12000">12s</option>
-            </select>
+<div class="card">
+    <h2>ALBUM POV EN VIVO</h2>
+    
+    <div class="versions-row">
+        <span class="versions-label">Versión:</span>
+        <div id="pillLite" class="version-pill">Lite</div>
+        <div id="pillPro" class="version-pill">Pro</div>
+        <div id="pillTop" class="version-pill">Top</div>
+    </div>
+    
+    <!-- PASO 1 -->
+    <div id="step-name" style="width: 100%;">
+        <p class="subtitle">Subí tus fotos, videos o dejanos tu mensaje</p>
+        
+        <div class="input-container">
+            <input type="text" id="inputNombre" class="input-autor" placeholder="Nombre" maxlength="30" oninput="validarCampos()" autocomplete="off">
         </div>
-    </header>
-
-    <div class="main-layout" id="mainLayout">
-        <!-- PANTALLA GIGANTE CON BOTÓN FLOTANTE Y EVENTO TÁCTIL -->
-        <div class="stage" id="stageContainer" onclick="avanzarSlideManual()">
-            <button class="btn-fullscreen-toggle" id="btnModeToggle" onclick="event.stopPropagation(); toggleModoPresentacionLimpia()" title="Alternar Modo Proyección Limpia">⛶ Pantalla Completa</button>
-            <span style="color: rgba(255,255,255,0.3); font-size: 1.2rem;">Cargando contenido...</span>
+        <div class="input-container">
+            <input type="text" id="inputApellido" class="input-autor" placeholder="Apellido" maxlength="30" oninput="validarCampos()" autocomplete="off">
         </div>
+        <span class="input-help">Ingresa tu nombre y apellido para continuar</span>
 
-        <!-- PANEL DE OPERADOR -->
-        <div class="operator-panel" id="operatorPanel">
-            
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <!-- Botonera de Control Optimizada y Simétrica en 2 Filas -->
-                <div class="mini-card" style="padding: 8px;">
-                    <div class="panel-section-title">Controles de Reproducción</div>
-                    <div class="playback-grid">
-                        <div class="playback-row">
-                            <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">◀ Anterior</button>
-                            <button class="btn-ctrl state-play" id="btnPlayPause" onclick="event.stopPropagation(); alternarPlayPause()" title="Play / Pausa">Play / Pausa</button>
-                            <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ▶</button>
-                        </div>
-                        <div class="playback-row">
-                            <button class="btn-ctrl" onclick="event.stopPropagation(); irAlPrimero()" title="Primero">⏮ Primero</button>
-                            <button class="btn-ctrl btn-stop-base" id="btnStop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
-                            <button class="btn-ctrl" onclick="event.stopPropagation(); irAlUltimo()" title="Último">⏭ Último</button>
-                        </div>
-                    </div>
-                </div>
+        <button type="button" id="btnContinuar" class="btn-action btn-continuar" disabled onclick="continuarPanel()">
+            <span>EMPEZAR</span>
+        </button>
+    </div>
 
-                <div class="mini-card">
-                    <div class="panel-section-title">Lo que está al aire (En vivo)</div>
-                    <div class="mini-screen" id="miniCurrent">
-                        <span>Sin señal</span>
-                    </div>
-                    <div id="currentAuthorInfo" style="font-size: 0.75rem; color: #00d4ff;">Autor: -</div>
-                </div>
+    <!-- PASO 2 -->
+    <div id="step-upload" class="hidden" style="width: 100%;">
+        <div class="fixed-header" id="displayNombre"></div>
+        <p class="subtitle">Tomá fotos, subí videos o dejanos tu saludo escrito.</p>
 
-                <div class="mini-card" id="previewCard" style="display: none;">
-                    <div class="panel-section-title">Vista Previa (Siguiente Pendiente)</div>
-                    <div class="mini-screen" id="miniPreview">
-                        <span>Sin pendientes</span>
-                    </div>
-                    <div id="previewAuthorInfo" style="font-size: 0.75rem; color: #fffd8d;">Autor: -</div>
-                    <div class="moderation-actions">
-                        <button class="btn-approve" onclick="event.stopPropagation(); moderarActual('APROBADO')">Aprobar</button>
-                        <button class="btn-reject" onclick="event.stopPropagation(); moderarActual('RECHAZADO')">Rechazar</button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="panel-section-title">Cola de elementos recientes</div>
-                    <div class="queue-list" id="queueList"></div>
-                </div>
+        <div id="upload-section" style="width: 100%;">
+            <div id="seccionCamara">
+                <label for="cameraInput" id="labelCamera" class="btn-action btn-select">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <span>Tomar Foto</span>
+                </label>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment">
             </div>
 
-            <!-- Footer integrado abajo de todo -->
-            <div>
-                <div class="footer-divider"></div>
-                <div class="footer-text">Diseño de Luis Alberto Cáceres<br>Código de Gemini © 2026</div>
+            <div id="seccionVideos">
+                <label for="videoInput" id="labelVideo" class="btn-action btn-select">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    <span>Grabar Video</span>
+                </label>
+                <input type="file" id="videoInput" accept="video/*" capture="environment">
             </div>
+
+            <div id="seccionGaleria">
+                <label for="galleryInput" id="labelGallery" class="btn-action btn-select">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Galería (Fotos y Videos)</span>
+                </label>
+                <input type="file" id="galleryInput" accept="image/*,video/*" multiple>
+            </div>
+
+            <div class="input-container" id="seccionTexto">
+                <textarea id="inputTexto" class="input-autor" placeholder="Escribe un mensaje o dedicatoria..." style="height: 70px; padding-top: 12px; resize: none; border-radius: 16px;" maxlength="250" oninput="actualizarInterfaz()"></textarea>
+            </div>
+
+            <div id="counter-badge"></div>
+
+            <button id="submitBtn" class="btn-action btn-submit" disabled onclick="enviarTodo()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>ENVIAR</span>
+            </button>
         </div>
     </div>
 
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5cRu4QOgrVq--Wp6a_u4N3sbe6Nebsujchjg0zoyl_-ypu5VS0Xn1LnGna02w0w7NwA/exec";
+    <button id="resetBtn" class="btn-action btn-reset" onclick="reiniciarPanel()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <span>Subir más contenido</span>
+    </button>
 
-        let listaContenidos = [];
-        let currentIndex = 0;
-        let isPlaying = true;
-        let modoModeracion = false;
-        let intervaloSlides = 8000;
-        let timer = null;
-        let videoTimeout = null;
-        let modoLimpioActivo = false;
+    <div id="status-msg"></div>
 
-        function toggleModoPresentacionLimpia() {
-            modoLimpioActivo = !modoLimpioActivo;
-            const panel = document.getElementById('operatorPanel');
-            const btn = document.getElementById('btnModeToggle');
+    <div class="footer-divider"></div>
+    <div class="footer-text">
+        Diseño de <a href="https://www.luisalbertocaceres.com.ar" target="_blank" style="color: inherit; text-decoration: underline;">Luis Alberto Cáceres</a><br>
+        Código de Gemini © 2026<br>
+        Prohibida su reproducción total y/o parcial
+    </div>
+</div>
 
-            if (modoLimpioActivo) {
-                panel.style.display = 'none';
-                btn.innerText = '🗗 Salir de Completa';
-            } else {
-                panel.style.display = 'flex';
-                btn.innerText = '⛶ Pantalla Completa';
-            }
-        }
+<div class="modal-overlay" id="customModal">
+    <div class="modal-box">
+        <div class="modal-title">ALBUM POV EN VIVO dice:</div>
+        <div class="modal-body" id="modalText">Mensaje de advertencia</div>
+        <button class="modal-btn" onclick="cerrarModal()">Aceptar</button>
+    </div>
+</div>
 
-        function limpiarUrlDrive(url) {
-            if (!url) return '';
-            if (url.includes('drive.google.com')) {
-                let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-                if (match && match[1]) {
-                    return `https://docs.google.com/uc?export=download&id=${match[1]}`;
+<script>
+    // PEGA AQUÍ LA URL DE TU WEB APP DE APPS SCRIPT (la que termina en /exec)
+    let WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5cRu4QOgrVq--Wp6a_u4N3sbe6Nebsujchjg0zoyl_-ypu5VS0Xn1LnGna02w0w7NwA/exec";
+    
+    let modoGlobal = "pro";
+    let validarListaGlobal = false;
+    let archivosAcumulados = [];
+    let nombreUsuario = '';
+
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+    const videoInput = document.getElementById('videoInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const counterBadge = document.getElementById('counter-badge');
+    const statusMsg = document.getElementById('status-msg');
+    const inputTexto = document.getElementById('inputTexto');
+
+    window.addEventListener('DOMContentLoaded', () => {
+        // Al estar en GitHub, consultamos la configuración inicial por fetch a Apps Script
+        fetch(`${WEB_APP_URL}?accion=obtenerConfiguracion`)
+            .then(res => res.json())
+            .then(config => {
+                if (config.modo) {
+                    modoGlobal = config.modo;
+                    aplicarRestriccionesModo(modoGlobal);
                 }
-            }
-            return url;
-        }
-
-        function toggleModeracion() {
-            modoModeracion = document.getElementById('checkModerar').checked;
-            document.getElementById('previewCard').style.display = modoModeracion ? 'block' : 'none';
-            sincronizarContenidos();
-        }
-
-        function sincronizarContenidos() {
-            fetchContenidos();
-        }
-
-        function alternarPlayPause() {
-            const btnPlay = document.getElementById('btnPlayPause');
-            const btnStop = document.getElementById('btnStop');
-
-            // Apagamos alerta visual de stop si estaba activo
-            btnStop.classList.remove('state-stop-active');
-
-            isPlaying = !isPlaying;
-            btnPlay.classList.remove('state-play', 'state-pause');
-
-            if (isPlaying) {
-                btnPlay.classList.add('state-play'); // Verde vibrante
-                iniciarLoop();
-                // Si el slide actual es un video, forzamos re-play por si estaba en pausa
-                let filtrados = obtenerElementosAProyectar();
-                if (filtrados.length > 0 && filtrados[currentIndex] && filtrados[currentIndex].tipo === 'VIDEO') {
-                    const activeVid = document.getElementById('activeVideo');
-                    if (activeVid) activeVid.play().catch(e => console.log("Reanudando video:", e));
+                if (config.validarLista !== undefined) {
+                    validarListaGlobal = config.validarLista;
                 }
-            } else {
-                btnPlay.classList.add('state-pause'); // Amarillo claro con jerarquía
-                clearInterval(timer);
-                if (videoTimeout) clearTimeout(videoTimeout);
-                
-                // Si hay un video reproduciéndose, lo pausamos de verdad
-                const activeVid = document.getElementById('activeVideo');
-                if (activeVid) activeVid.pause();
-            }
+                if (config.fondoId) {
+                    document.body.style.backgroundImage = `url('https://lh3.googleusercontent.com/d/${config.fondoId}')`;
+                }
+            })
+            .catch(err => console.error("Error al cargar configuración", err));
+    });
+
+    function aplicarRestriccionesModo(modo) {
+        const secVideos = document.getElementById('seccionVideos');
+        const secTexto = document.getElementById('seccionTexto');
+        
+        const pillLite = document.getElementById('pillLite');
+        const pillPro = document.getElementById('pillPro');
+        const pillTop = document.getElementById('pillTop');
+
+        if(pillLite) pillLite.classList.remove('active');
+        if(pillPro) pillPro.classList.remove('active');
+        if(pillTop) pillTop.classList.remove('active');
+
+        if (modo === 'lite') {
+            if(pillLite) pillLite.classList.add('active');
+            if (secVideos) secVideos.style.display = 'none';
+            if (secTexto) secTexto.style.display = 'none';
+        } else if (modo === 'pro') {
+            if(pillPro) pillPro.classList.add('active');
+            if (secVideos) secVideos.style.display = 'block';
+            if (secTexto) secTexto.style.display = 'block';
+        } else if (modo === 'top') {
+            if(pillTop) pillTop.classList.add('active');
+            if (secVideos) secVideos.style.display = 'block';
+            if (secTexto) secTexto.style.display = 'block';
+        }
+    }
+
+    function mostrarModal(mensaje) {
+        document.getElementById('modalText').innerText = mensaje;
+        document.getElementById('customModal').classList.add('active');
+    }
+
+    function cerrarModal() {
+        document.getElementById('customModal').classList.remove('active');
+    }
+
+    function validarCampos() {
+        const nombre = document.getElementById('inputNombre').value.trim();
+        const apellido = document.getElementById('inputApellido').value.trim();
+        const btn = document.getElementById('btnContinuar');
+        
+        if (nombre.length > 0 && apellido.length > 0) {
+            btn.removeAttribute('disabled');
+            btn.classList.add('active');
+        } else {
+            btn.setAttribute('disabled', 'true');
+            btn.classList.remove('active');
+        }
+    }
+
+    function continuarPanel() {
+        const nombre = document.getElementById('inputNombre').value.trim();
+        const apellido = document.getElementById('inputApellido').value.trim();
+
+        if (!nombre || !apellido) {
+            mostrarModal("Por favor complete nombre y apellido para continuar.");
+            return;
         }
 
-        function pararReproduccion() {
-            isPlaying = false;
-            clearInterval(timer);
-            if (videoTimeout) clearTimeout(videoTimeout);
+        nombreUsuario = `${nombre} ${apellido}`;
+
+        if (validarListaGlobal) {
+            statusMsg.style.color = "#fffd8d";
+            statusMsg.innerText = "Verificando autorización...";
             
-            // Gestión de clases de los botones (Stop se enciende con borde/glow y Play pasa a amarillo/pausa)
-            const btnPlay = document.getElementById('btnPlayPause');
-            const btnStop = document.getElementById('btnStop');
-            
-            btnPlay.classList.remove('state-play');
-            btnPlay.classList.add('state-pause'); 
-
-            btnStop.classList.add('state-stop-active');
-
-            const stage = document.getElementById('stageContainer');
-            const btnHtml = stage.querySelector('#btnModeToggle') ? stage.querySelector('#btnModeToggle').outerHTML : '';
-            stage.innerHTML = btnHtml + `<span style="color: rgba(255,255,255,0.4); font-size: 1.2rem;">Reproducción detenida (Stop)</span>`;
-        }
-
-        function cambiarVelocidad() {
-            intervaloSlides = parseInt(document.getElementById('selectVelocidad').value);
-            if (isPlaying) iniciarLoop();
-        }
-
-        function fetchContenidos() {
-            fetch(`${WEB_APP_URL}?accion=obtenerContenido`)
+            fetch(`${WEB_APP_URL}?accion=validarInvitado&nombre=${encodeURIComponent(nombre)}&apellido=${encodeURIComponent(apellido)}`)
                 .then(res => res.json())
-                .then(data => {
-                    listaContenidos = data;
-                    actualizarColaUI();
-                    if (listaContenidos.length > 0 && (currentIndex === 0 || currentIndex >= listaContenidos.length) && document.getElementById('stageContainer').querySelector('span')) {
-                        renderizarPantalla(listaContenidos[0]);
+                .then(res => {
+                    statusMsg.innerText = "";
+                    if (res.status === "success") {
+                        document.getElementById('displayNombre').textContent = nombreUsuario;
+                        document.getElementById('step-name').classList.add('hidden');
+                        document.getElementById('step-upload').classList.remove('hidden');
+                    } else {
+                        mostrarModal(res.message);
                     }
                 })
-                .catch(err => console.error("Error al obtener contenido", err));
+                .catch(err => {
+                    statusMsg.innerText = "";
+                    mostrarModal("Error de conexión al validar invitado.");
+                });
+        } else {
+            document.getElementById('displayNombre').textContent = nombreUsuario;
+            document.getElementById('step-name').classList.add('hidden');
+            document.getElementById('step-upload').classList.remove('hidden');
+        }
+    }
+
+    cameraInput.addEventListener('change', (e) => {
+        agregarArchivos(e.target.files);
+        cameraInput.value = '';
+    });
+
+    galleryInput.addEventListener('change', (e) => {
+        agregarArchivos(e.target.files);
+        galleryInput.value = '';
+    });
+
+    videoInput.addEventListener('change', (e) => {
+        agregarArchivos(e.target.files);
+        videoInput.value = '';
+    });
+
+    function agregarArchivos(nuevosFiles) {
+        for (let file of nuevosFiles) {
+            archivosAcumulados.push(file);
+        }
+        actualizarInterfaz();
+    }
+
+    function actualizarInterfaz() {
+        const textoEscrito = inputTexto ? inputTexto.value.trim() : "";
+        let fotosCount = archivosAcumulados.filter(f => f.type.startsWith('image/')).length;
+        let videosCount = archivosAcumulados.filter(f => f.type.startsWith('video/')).length;
+        let descripciones = [];
+
+        if (fotosCount > 0) descripciones.push(`${fotosCount} foto(s)`);
+        if (videosCount > 0) descripciones.push(`${videosCount} video(s)`);
+        if (textoEscrito.length > 0) descripciones.push(`1 texto`);
+
+        if (descripciones.length > 0 || archivosAcumulados.length > 0) {
+            counterBadge.innerText = `📂 Seleccionado: ${descripciones.join(', ')}`;
+            submitBtn.removeAttribute('disabled');
+        } else {
+            counterBadge.innerText = "";
+            submitBtn.setAttribute('disabled', 'true');
+        }
+        statusMsg.innerText = "";
+    }
+
+    function setFormDisabled(disabled) {
+        submitBtn.disabled = disabled;
+        cameraInput.disabled = disabled;
+        galleryInput.disabled = disabled;
+        videoInput.disabled = disabled;
+        if(inputTexto) inputTexto.disabled = disabled;
+    }
+
+    async function enviarTodo() {
+        const textoEscrito = inputTexto ? inputTexto.value.trim() : "";
+        if (archivosAcumulados.length === 0 && !textoEscrito) {
+            mostrarModal("Por favor selecciona al menos una foto, un video o escribe un mensaje para enviar.");
+            return;
         }
 
-        setInterval(fetchContenidos, 5000);
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchContenidos();
-            const btn = document.getElementById('btnPlayPause');
-            btn.classList.add('state-play'); // Arranca en verde
-            iniciarLoop();
-        });
+        setFormDisabled(true);
+        
+        let correctasFotos = 0;
+        let correctasVideos = 0;
+        let enviadoTexto = 0;
+        let rechazadas = 0;
 
-        function iniciarLoop() {
-            clearInterval(timer);
-            let filtrados = obtenerElementosAProyectar();
-            if (filtrados.length > 0 && filtrados[currentIndex] && filtrados[currentIndex].tipo !== 'VIDEO') {
-                programarSiguienteSlide(intervaloSlides);
-            }
-        }
+        const totalPasos = archivosAcumulados.length + (textoEscrito ? 1 : 0);
+        let actual = 0;
 
-        function programarSiguienteSlide(tiempo) {
-            clearInterval(timer);
-            if (!isPlaying) return;
-            timer = setInterval(() => {
-                avanzarSlideManual();
-            }, tiempo);
-        }
+        for (let i = 0; i < archivosAcumulados.length; i++) {
+            const file = archivosAcumulados[i];
+            actual++;
+            statusMsg.style.color = "#fffd8d";
+            statusMsg.innerText = `Procesando archivo ${actual} de ${totalPasos}...`;
 
-        function avanzarSlideManual() {
-            let filtrados = obtenerElementosAProyectar();
-            if (filtrados.length === 0) return;
+            try {
+                let payload = {};
+                const nombresPartes = nombreUsuario.split(" ");
+                const nombreSolo = nombresPartes[0] || "";
+                const apellidoSolo = nombresPartes.slice(1).join(" ") || "";
 
-            currentIndex = (currentIndex + 1) % filtrados.length;
-            renderizarPantalla(filtrados[currentIndex]);
-        }
-
-        function retrocederSlide() {
-            let filtrados = obtenerElementosAProyectar();
-            if (filtrados.length === 0) return;
-
-            currentIndex = (currentIndex - 1 + filtrados.length) % filtrados.length;
-            renderizarPantalla(filtrados[currentIndex]);
-        }
-
-        function irAlPrimero() {
-            let filtrados = obtenerElementosAProyectar();
-            if (filtrados.length === 0) return;
-            currentIndex = 0;
-            renderizarPantalla(filtrados[currentIndex]);
-        }
-
-        function irAlUltimo() {
-            let filtrados = obtenerElementosAProyectar();
-            if (filtrados.length === 0) return;
-            currentIndex = filtrados.length - 1;
-            renderizarPantalla(filtrados[currentIndex]);
-        }
-
-        function obtenerElementosAProyectar() {
-            if (modoModeracion) {
-                return listaContenidos.filter(item => item.estado === 'APROBADO');
-            } else {
-                return listaContenidos; 
-            }
-        }
-
-        function renderizarPantalla(item) {
-            const stage = document.getElementById('stageContainer');
-            const miniCurrent = document.getElementById('miniCurrent');
-            if (!item) return;
-
-            if (videoTimeout) {
-                clearTimeout(videoTimeout);
-                videoTimeout = null;
-            }
-
-            // Al cambiar de slide por acción manual o automática, si stop estaba activo, lo retiramos visualmente
-            document.getElementById('btnStop').classList.remove('state-stop-active');
-
-            document.getElementById('currentAuthorInfo').innerText = `Autor: ${item.autor}`;
-            let urlLimpia = limpiarUrlDrive(item.url);
-
-            let htmlContent = '';
-            let miniHtml = '';
-
-            if (item.tipo === 'TEXTO') {
-                htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
-                miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
-                if (isPlaying) programarSiguienteSlide(intervaloSlides);
-            } else if (item.tipo === 'VIDEO') {
-                // RCP de alta potencia para videos: preload="auto", muted nativo para evitar bloqueos del navegador y atributos de compatibilidad total
-                htmlContent = `<div class="media-container"><video id="activeVideo" src="${urlLimpia}" autoplay muted playsinline preload="auto"></video></div>`;
-                miniHtml = `<video src="${urlLimpia}" muted></video>`;
-            } else {
-                htmlContent = `<div class="media-container"><img src="${urlLimpia}" alt="Foto"></div>`;
-                miniHtml = `<img src="${urlLimpia}" alt="Miniatura">`;
-                if (isPlaying) programarSiguienteSlide(intervaloSlides);
-            }
-
-            const btnHtml = stage.querySelector('#btnModeToggle').outerHTML;
-            stage.innerHTML = btnHtml + htmlContent + `<div class="author-tag">📷 ${item.autor}</div>`;
-            miniCurrent.innerHTML = miniHtml;
-
-            if (item.tipo === 'VIDEO') {
-                const videoElement = document.getElementById('activeVideo');
-                if (videoElement) {
-                    videoElement.load(); // Forzar descarga inmediata de búfer
-                    
-                    let intentoPlay = setInterval(() => {
-                        if (isPlaying) {
-                            videoElement.play().then(() => {
-                                clearInterval(intentoPlay);
-                            }).catch(e => {
-                                console.log("Reintentando play de alta potencia...", e);
-                            });
-                        } else {
-                            clearInterval(intentoPlay);
-                        }
-                    }, 300);
-
-                    videoElement.onended = () => {
-                        if (isPlaying) avanzarSlideManual();
+                if (file.type.startsWith('image/')) {
+                    let base64Comprimido = await comprimirImagen(file);
+                    payload = {
+                        tipo: 'foto',
+                        file: base64Comprimido,
+                        name: file.name,
+                        mimeType: 'image/jpeg',
+                        nombre: nombreSolo,
+                        apellido: apellidoSolo
                     };
-
-                    // Seguridad por si el stream se traba de manera definitiva
-                    videoTimeout = setTimeout(() => {
-                        clearInterval(intentoPlay);
-                        if (isPlaying) {
-                            avanzarSlideManual();
-                        }
-                    }, Math.max(intervaloSlides, 18000));
+                    correctasFotos++;
+                } else if (file.type.startsWith('video/')) {
+                    let base64Video = await leerArchivoBase64(file);
+                    payload = {
+                        tipo: 'video',
+                        file: base64Video,
+                        name: file.name,
+                        mimeType: file.type,
+                        nombre: nombreSolo,
+                        apellido: apellidoSolo
+                    };
+                    correctasVideos++;
                 }
-            }
 
-            actualizarColaUI();
-            if (modoModeracion) actualizarVistaPrevia();
-        }
-
-        function actualizarVistaPrevia() {
-            let pendientes = listaContenidos.filter(item => item.estado === 'PENDIENTE');
-            const miniPreview = document.getElementById('miniPreview');
-            const previewInfo = document.getElementById('previewAuthorInfo');
-
-            if (pendientes.length > 0) {
-                let next = pendientes[0];
-                previewInfo.innerText = `Autor: ${next.autor} (${next.tipo})`;
-                let urlLimpiaNext = limpiarUrlDrive(next.url);
-                if (next.tipo === 'TEXTO') {
-                    miniPreview.innerHTML = `<span style="font-size:0.7rem; padding:5px;">${next.detalle}</span>`;
-                } else if (next.tipo === 'VIDEO') {
-                    miniPreview.innerHTML = `<video src="${urlLimpiaNext}" muted></video>`;
-                } else {
-                    miniPreview.innerHTML = `<img src="${urlLimpiaNext}">`;
-                }
-            } else {
-                miniPreview.innerHTML = `<span>No hay pendientes</span>`;
-                previewInfo.innerText = `Autor: -`;
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                rechazadas++;
             }
         }
 
-        function moderarActual(nuevoEstado) {
-            let pendientes = listaContenidos.filter(item => item.estado === 'PENDIENTE');
-            if (pendientes.length === 0) return;
-            let target = pendientes[0];
+        if (textoEscrito) {
+            actual++;
+            statusMsg.style.color = "#fffd8d";
+            statusMsg.innerText = `Enviando mensaje de texto (${actual} de ${totalPasos})...`;
 
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    tipo: "moderar",
-                    rowIndex: target.rowIndex,
-                    nuevoEstado: nuevoEstado
-                })
-            })
-            .then(res => res.json())
-            .then(res => {
-                fetchContenidos();
-            });
+            try {
+                const nombresPartes = nombreUsuario.split(" ");
+                const nombreSolo = nombresPartes[0] || "";
+                const apellidoSolo = nombresPartes.slice(1).join(" ") || "";
+
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        tipo: 'texto',
+                        contenido: textoEscrito,
+                        nombre: nombreSolo,
+                        apellido: apellidoSolo
+                    })
+                });
+                enviadoTexto = 1;
+            } catch (err) {
+                rechazadas++;
+            }
         }
 
-        function actualizarColaUI() {
-            const queueList = document.getElementById('queueList');
-            queueList.innerHTML = '';
-            let filtrados = obtenerElementosAProyectar();
+        statusMsg.style.color = "#75f992";
+        statusMsg.innerHTML = `✨ ¡LISTO! Se enviaron: ${correctasFotos} foto(s), ${correctasVideos} video(s) y ${enviadoTexto} texto.` + 
+            (rechazadas > 0 ? `<br><span style="color:#ff6b6b;">(${rechazadas} error/es)</span>` : '');
 
-            listaContenidos.slice(-10).reverse().forEach(item => {
-                let div = document.createElement('div');
-                div.className = 'queue-item';
-                if (filtrados[currentIndex] && filtrados[currentIndex].rowIndex === item.rowIndex) {
-                    div.classList.add('active-item');
-                }
-                div.innerHTML = `<span><b>${item.autor}</b> (${item.tipo})</span> <span style="color:${item.estado==='APROBADO'?'#2bb84b':item.estado==='RECHAZADO'?'#d93838':'#fffd8d'}">${item.estado}</span>`;
-                queueList.appendChild(div);
-            });
-            if (modoModeracion) actualizarVistaPrevia();
-        }
-    </script>
+        submitBtn.style.setProperty('display', 'none', 'important');
+        resetBtn.style.setProperty('display', 'flex', 'important');
+    }
+
+    function reiniciarPanel() {
+        archivosAcumulados = [];
+        statusMsg.innerText = "";
+        counterBadge.innerText = "";
+        if(inputTexto) inputTexto.value = "";
+        
+        setFormDisabled(false);
+        submitBtn.setAttribute('disabled', 'true');
+        resetBtn.style.setProperty('display', 'none', 'important');
+        submitBtn.style.setProperty('display', 'flex', 'important');
+    }
+
+    function leerArchivoBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function comprimirImagen(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_WIDTH = 1000;
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.80);
+                    resolve(dataUrl);
+                };
+            };
+        });
+    }
+</script>
+
 </body>
 </html>
