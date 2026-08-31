@@ -100,15 +100,22 @@
             font-weight: bold; 
             cursor: pointer; 
             text-align: center;
-            transition: background 0.2s;
+            transition: background 0.2s, box-shadow 0.2s, border 0.2s;
             background: #3c095c;
         }
         .btn-ctrl:hover { background: #5a189a; }
         
-        /* Estados de Color del Botón Play/Pausa */
+        /* Jerarquía de Estados de Play/Pausa (Nunca grises) */
         .btn-ctrl.state-play { background: #2bb84b; border-color: #4ce66d; }
         .btn-ctrl.state-pause { background: #b8972b; border-color: #ffd700; color: #fff; }
-        .btn-ctrl.state-stop { background: #555555; border-color: #777777; }
+
+        /* Botón Stop con feedback visual potente al activarse */
+        .btn-ctrl.btn-stop-base { background: #d93838; border-color: #ff5c5c; }
+        .btn-ctrl.state-stop-active { 
+            background: #ff1e1e !important; 
+            border-color: #ffffff !important; 
+            box-shadow: 0 0 12px rgba(255, 30, 30, 0.9); 
+        }
 
         .moderation-actions { display: flex; gap: 8px; margin-top: 8px; }
         .btn-approve { flex: 1; background: #2bb84b; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
@@ -166,7 +173,7 @@
                         </div>
                         <div class="playback-row">
                             <button class="btn-ctrl" onclick="event.stopPropagation(); irAlPrimero()" title="Primero">⏮ Primero</button>
-                            <button class="btn-ctrl state-stop" id="btnStop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
+                            <button class="btn-ctrl btn-stop-base" id="btnStop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
                             <button class="btn-ctrl" onclick="event.stopPropagation(); irAlUltimo()" title="Último">⏭ Último</button>
                         </div>
                     </div>
@@ -254,18 +261,32 @@
         }
 
         function alternarPlayPause() {
+            const btnPlay = document.getElementById('btnPlayPause');
+            const btnStop = document.getElementById('btnStop');
+
+            // Apagamos alerta visual de stop si estaba activo
+            btnStop.classList.remove('state-stop-active');
+
             isPlaying = !isPlaying;
-            const btn = document.getElementById('btnPlayPause');
-            
-            btn.classList.remove('state-play', 'state-pause', 'state-stop');
+            btnPlay.classList.remove('state-play', 'state-pause');
 
             if (isPlaying) {
-                btn.classList.add('state-play'); // Verde
+                btnPlay.classList.add('state-play'); // Verde vibrante
                 iniciarLoop();
+                // Si el slide actual es un video, forzamos re-play por si estaba en pausa
+                let filtrados = obtenerElementosAProyectar();
+                if (filtrados.length > 0 && filtrados[currentIndex] && filtrados[currentIndex].tipo === 'VIDEO') {
+                    const activeVid = document.getElementById('activeVideo');
+                    if (activeVid) activeVid.play().catch(e => console.log("Reanudando video:", e));
+                }
             } else {
-                btn.classList.add('state-pause'); // Amarillo
+                btnPlay.classList.add('state-pause'); // Amarillo claro con jerarquía
                 clearInterval(timer);
                 if (videoTimeout) clearTimeout(videoTimeout);
+                
+                // Si hay un video reproduciéndose, lo pausamos de verdad
+                const activeVid = document.getElementById('activeVideo');
+                if (activeVid) activeVid.pause();
             }
         }
 
@@ -274,9 +295,14 @@
             clearInterval(timer);
             if (videoTimeout) clearTimeout(videoTimeout);
             
-            const btn = document.getElementById('btnPlayPause');
-            btn.classList.remove('state-play', 'state-pause');
-            btn.classList.add('state-stop'); // Apaga el verde/amarillo del play/pause
+            // Gestión de clases de los botones (Stop se enciende con borde/glow y Play pasa a amarillo/pausa)
+            const btnPlay = document.getElementById('btnPlayPause');
+            const btnStop = document.getElementById('btnStop');
+            
+            btnPlay.classList.remove('state-play');
+            btnPlay.classList.add('state-pause'); 
+
+            btnStop.classList.add('state-stop-active');
 
             const stage = document.getElementById('stageContainer');
             const btnHtml = stage.querySelector('#btnModeToggle') ? stage.querySelector('#btnModeToggle').outerHTML : '';
@@ -373,6 +399,9 @@
                 videoTimeout = null;
             }
 
+            // Al cambiar de slide por acción manual o automática, si stop estaba activo, lo retiramos visualmente
+            document.getElementById('btnStop').classList.remove('state-stop-active');
+
             document.getElementById('currentAuthorInfo').innerText = `Autor: ${item.autor}`;
             let urlLimpia = limpiarUrlDrive(item.url);
 
@@ -384,6 +413,7 @@
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
                 if (isPlaying) programarSiguienteSlide(intervaloSlides);
             } else if (item.tipo === 'VIDEO') {
+                // RCP de alta potencia para videos: preload="auto", muted nativo para evitar bloqueos del navegador y atributos de compatibilidad total
                 htmlContent = `<div class="media-container"><video id="activeVideo" src="${urlLimpia}" autoplay muted playsinline preload="auto"></video></div>`;
                 miniHtml = `<video src="${urlLimpia}" muted></video>`;
             } else {
@@ -399,18 +429,31 @@
             if (item.tipo === 'VIDEO') {
                 const videoElement = document.getElementById('activeVideo');
                 if (videoElement) {
-                    videoElement.load();
-                    videoElement.play().catch(e => console.log("Restricción de autoplay en video:", e));
+                    videoElement.load(); // Forzar descarga inmediata de búfer
                     
+                    let intentoPlay = setInterval(() => {
+                        if (isPlaying) {
+                            videoElement.play().then(() => {
+                                clearInterval(intentoPlay);
+                            }).catch(e => {
+                                console.log("Reintentando play de alta potencia...", e);
+                            });
+                        } else {
+                            clearInterval(intentoPlay);
+                        }
+                    }, 300);
+
                     videoElement.onended = () => {
                         if (isPlaying) avanzarSlideManual();
                     };
 
+                    // Seguridad por si el stream se traba de manera definitiva
                     videoTimeout = setTimeout(() => {
+                        clearInterval(intentoPlay);
                         if (isPlaying) {
                             avanzarSlideManual();
                         }
-                    }, Math.max(intervaloSlides, 15000));
+                    }, Math.max(intervaloSlides, 18000));
                 }
             }
 
