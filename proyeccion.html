@@ -67,7 +67,18 @@
         .btn-fullscreen-toggle:hover { background: #a83bf6; color: #fff; }
 
         /* Panel de Control / Operador */
-        .operator-panel { flex: 1; background: #1c0626; padding: 15px; display: flex; flex-direction: column; gap: 12px; min-width: 300px; overflow-y: auto; transition: all 0.3s ease; }
+        .operator-panel { 
+            flex: 1; 
+            background: #1c0626; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            gap: 12px; 
+            min-width: 300px; 
+            overflow-y: auto; 
+            transition: all 0.3s ease; 
+        }
         .panel-section-title { font-size: 0.75rem; text-transform: uppercase; color: #d0c0e0; letter-spacing: 1px; margin-bottom: 4px; }
         
         .mini-card { background: #22022b; border-radius: 10px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
@@ -75,11 +86,29 @@
         .mini-screen img, .mini-screen video { max-width: 100%; max-height: 100%; object-fit: contain; }
         .mini-screen span { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
 
-        .playback-buttons { display: flex; gap: 5px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
-        .btn-ctrl { background: #3c095c; color: #fff; border: 1px solid rgba(0,212,255,0.3); padding: 5px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+        /* Estructura de la Botonera Simétrica */
+        .playback-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+        .playback-row { display: flex; gap: 6px; justify-content: center; }
+        
+        .btn-ctrl { 
+            flex: 1; 
+            color: #fff; 
+            border: 1px solid rgba(0,212,255,0.3); 
+            padding: 8px 5px; 
+            border-radius: 6px; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-align: center;
+            transition: background 0.2s;
+            background: #3c095c;
+        }
         .btn-ctrl:hover { background: #5a189a; }
-        .btn-ctrl.active-play { background: #2bb84b; border-color: #fff; }
-        .btn-ctrl.btn-stop { background: #d93838; }
+        
+        /* Estados de Color del Botón Play/Pausa */
+        .btn-ctrl.state-play { background: #2bb84b; border-color: #4ce66d; }
+        .btn-ctrl.state-pause { background: #b8972b; border-color: #ffd700; color: #fff; }
+        .btn-ctrl.state-stop { background: #555555; border-color: #777777; }
 
         .moderation-actions { display: flex; gap: 8px; margin-top: 8px; }
         .btn-approve { flex: 1; background: #2bb84b; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
@@ -89,7 +118,7 @@
         .queue-item { background: #14051c; padding: 8px; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .queue-item.active-item { border-color: #00d4ff; background: #240833; }
 
-        /* Footer integrado para el panel de operador */
+        /* Footer integrado y alineado al fondo */
         .footer-divider { width: 100%; height: 2px; background: rgba(0, 0, 0, 0.8); margin: 15px 0 10px 0; }
         .footer-text { color: #00d4ff; font-size: 0.7rem; text-align: center; line-height: 1.45; opacity: 0.9; }
 
@@ -125,47 +154,55 @@
         <!-- PANEL DE OPERADOR -->
         <div class="operator-panel" id="operatorPanel">
             
-            <div class="mini-card" style="padding: 8px;">
-                <div class="panel-section-title">Controles de Reproducción</div>
-                <div class="playback-buttons">
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); irAlPrimero()" title="Primero">⏮ Primero</button>
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">◀ Anterior</button>
-                    <button class="btn-ctrl" id="btnPlay" onclick="event.stopPropagation(); fijarReproduccion(true)" title="Reproducir">▶ Play</button>
-                    <button class="btn-ctrl" id="btnPause" onclick="event.stopPropagation(); fijarReproduccion(false)" title="Pausar">⏸ Pausa</button>
-                    <button class="btn-ctrl btn-stop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ▶</button>
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); irAlUltimo()" title="Último">⏭ Último</button>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Botonera de Control Optimizada y Simétrica en 2 Filas -->
+                <div class="mini-card" style="padding: 8px;">
+                    <div class="panel-section-title">Controles de Reproducción</div>
+                    <div class="playback-grid">
+                        <div class="playback-row">
+                            <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">◀ Anterior</button>
+                            <button class="btn-ctrl state-play" id="btnPlayPause" onclick="event.stopPropagation(); alternarPlayPause()" title="Play / Pausa">Play / Pausa</button>
+                            <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ▶</button>
+                        </div>
+                        <div class="playback-row">
+                            <button class="btn-ctrl" onclick="event.stopPropagation(); irAlPrimero()" title="Primero">⏮ Primero</button>
+                            <button class="btn-ctrl state-stop" id="btnStop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
+                            <button class="btn-ctrl" onclick="event.stopPropagation(); irAlUltimo()" title="Último">⏭ Último</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-card">
+                    <div class="panel-section-title">Lo que está al aire (En vivo)</div>
+                    <div class="mini-screen" id="miniCurrent">
+                        <span>Sin señal</span>
+                    </div>
+                    <div id="currentAuthorInfo" style="font-size: 0.75rem; color: #00d4ff;">Autor: -</div>
+                </div>
+
+                <div class="mini-card" id="previewCard" style="display: none;">
+                    <div class="panel-section-title">Vista Previa (Siguiente Pendiente)</div>
+                    <div class="mini-screen" id="miniPreview">
+                        <span>Sin pendientes</span>
+                    </div>
+                    <div id="previewAuthorInfo" style="font-size: 0.75rem; color: #fffd8d;">Autor: -</div>
+                    <div class="moderation-actions">
+                        <button class="btn-approve" onclick="event.stopPropagation(); moderarActual('APROBADO')">Aprobar</button>
+                        <button class="btn-reject" onclick="event.stopPropagation(); moderarActual('RECHAZADO')">Rechazar</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="panel-section-title">Cola de elementos recientes</div>
+                    <div class="queue-list" id="queueList"></div>
                 </div>
             </div>
 
-            <div class="mini-card">
-                <div class="panel-section-title">Lo que está al aire (En vivo)</div>
-                <div class="mini-screen" id="miniCurrent">
-                    <span>Sin señal</span>
-                </div>
-                <div id="currentAuthorInfo" style="font-size: 0.75rem; color: #00d4ff;">Autor: -</div>
-            </div>
-
-            <div class="mini-card" id="previewCard" style="display: none;">
-                <div class="panel-section-title">Vista Previa (Siguiente Pendiente)</div>
-                <div class="mini-screen" id="miniPreview">
-                    <span>Sin pendientes</span>
-                </div>
-                <div id="previewAuthorInfo" style="font-size: 0.75rem; color: #fffd8d;">Autor: -</div>
-                <div class="moderation-actions">
-                    <button class="btn-approve" onclick="event.stopPropagation(); moderarActual('APROBADO')">Aprobar</button>
-                    <button class="btn-reject" onclick="event.stopPropagation(); moderarActual('RECHAZADO')">Rechazar</button>
-                </div>
-            </div>
-
+            <!-- Footer integrado abajo de todo -->
             <div>
-                <div class="panel-section-title">Cola de elementos recientes</div>
-                <div class="queue-list" id="queueList"></div>
+                <div class="footer-divider"></div>
+                <div class="footer-text">Diseño de Luis Alberto Cáceres<br>Código de Gemini © 2026</div>
             </div>
-
-            <!-- Footer incorporado en el panel lateral -->
-            <div class="footer-divider"></div>
-            <div class="footer-text">Diseño de Luis Alberto Cáceres<br>Código de Gemini © 2026</div>
         </div>
     </div>
 
@@ -178,6 +215,7 @@
         let modoModeracion = false;
         let intervaloSlides = 8000;
         let timer = null;
+        let videoTimeout = null;
         let modoLimpioActivo = false;
 
         function toggleModoPresentacionLimpia() {
@@ -215,35 +253,34 @@
             fetchContenidos();
         }
 
-        function fijarReproduccion(estado) {
-            isPlaying = estado;
-            actualizarBotoneraPlayPause();
+        function alternarPlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('btnPlayPause');
+            
+            btn.classList.remove('state-play', 'state-pause', 'state-stop');
+
             if (isPlaying) {
+                btn.classList.add('state-play'); // Verde
                 iniciarLoop();
             } else {
+                btn.classList.add('state-pause'); // Amarillo
                 clearInterval(timer);
+                if (videoTimeout) clearTimeout(videoTimeout);
             }
         }
 
         function pararReproduccion() {
             isPlaying = false;
             clearInterval(timer);
-            actualizarBotoneraPlayPause();
+            if (videoTimeout) clearTimeout(videoTimeout);
+            
+            const btn = document.getElementById('btnPlayPause');
+            btn.classList.remove('state-play', 'state-pause');
+            btn.classList.add('state-stop'); // Apaga el verde/amarillo del play/pause
+
             const stage = document.getElementById('stageContainer');
             const btnHtml = stage.querySelector('#btnModeToggle') ? stage.querySelector('#btnModeToggle').outerHTML : '';
             stage.innerHTML = btnHtml + `<span style="color: rgba(255,255,255,0.4); font-size: 1.2rem;">Reproducción detenida (Stop)</span>`;
-        }
-
-        function actualizarBotoneraPlayPause() {
-            const btnPlay = document.getElementById('btnPlay');
-            const btnPause = document.getElementById('btnPause');
-            if (isPlaying) {
-                btnPlay.classList.add('active-play');
-                btnPause.classList.remove('active-play');
-            } else {
-                btnPlay.classList.remove('active-play');
-                btnPause.classList.add('active-play');
-            }
         }
 
         function cambiarVelocidad() {
@@ -267,17 +304,25 @@
         setInterval(fetchContenidos, 5000);
         window.addEventListener('DOMContentLoaded', () => {
             fetchContenidos();
-            actualizarBotoneraPlayPause();
+            const btn = document.getElementById('btnPlayPause');
+            btn.classList.add('state-play'); // Arranca en verde
             iniciarLoop();
         });
 
         function iniciarLoop() {
             clearInterval(timer);
+            let filtrados = obtenerElementosAProyectar();
+            if (filtrados.length > 0 && filtrados[currentIndex] && filtrados[currentIndex].tipo !== 'VIDEO') {
+                programarSiguienteSlide(intervaloSlides);
+            }
+        }
+
+        function programarSiguienteSlide(tiempo) {
+            clearInterval(timer);
+            if (!isPlaying) return;
             timer = setInterval(() => {
-                if (isPlaying) {
-                    avanzarSlideManual();
-                }
-            }, intervaloSlides);
+                avanzarSlideManual();
+            }, tiempo);
         }
 
         function avanzarSlideManual() {
@@ -323,6 +368,11 @@
             const miniCurrent = document.getElementById('miniCurrent');
             if (!item) return;
 
+            if (videoTimeout) {
+                clearTimeout(videoTimeout);
+                videoTimeout = null;
+            }
+
             document.getElementById('currentAuthorInfo').innerText = `Autor: ${item.autor}`;
             let urlLimpia = limpiarUrlDrive(item.url);
 
@@ -332,12 +382,14 @@
             if (item.tipo === 'TEXTO') {
                 htmlContent = `<div class="stage-text">"${item.detalle}"<br><span style="font-size:1.2rem; color:#00d4ff;">- ${item.autor}</span></div>`;
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
+                if (isPlaying) programarSiguienteSlide(intervaloSlides);
             } else if (item.tipo === 'VIDEO') {
-                htmlContent = `<div class="media-container"><video src="${urlLimpia}" autoplay muted playsinline onended="avanzarSlideManual()"></video></div>`;
+                htmlContent = `<div class="media-container"><video id="activeVideo" src="${urlLimpia}" autoplay muted playsinline></video></div>`;
                 miniHtml = `<video src="${urlLimpia}" muted></video>`;
             } else {
                 htmlContent = `<div class="media-container"><img src="${urlLimpia}" alt="Foto"></div>`;
                 miniHtml = `<img src="${urlLimpia}" alt="Miniatura">`;
+                if (isPlaying) programarSiguienteSlide(intervaloSlides);
             }
 
             const btnHtml = stage.querySelector('#btnModeToggle').outerHTML;
@@ -345,12 +397,20 @@
             miniCurrent.innerHTML = miniHtml;
 
             if (item.tipo === 'VIDEO') {
-                const videoElement = stage.querySelector('video');
+                const videoElement = document.getElementById('activeVideo');
                 if (videoElement) {
-                    videoElement.play().catch(e => console.log("Autoplay con restricciones del navegador:", e));
+                    videoElement.play().catch(e => console.log("Restricción de autoplay en video:", e));
+                    
+                    videoElement.onended = () => {
+                        if (isPlaying) avanzarSlideManual();
+                    };
+
+                    videoTimeout = setTimeout(() => {
+                        if (isPlaying) {
+                            avanzarSlideManual();
+                        }
+                    }, Math.max(intervaloSlides, 15000));
                 }
-            } else {
-                if (isPlaying) iniciarLoop();
             }
 
             actualizarColaUI();
