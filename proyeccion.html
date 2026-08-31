@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALBUM POV EN VIVO - Proyección</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Exo 2', sans-serif; }
@@ -184,7 +185,6 @@
         function limpiarUrlDrive(url) {
             if (!url) return '';
             if (url.includes('drive.google.com')) {
-                // Extrae el ID del archivo de Google Drive para forzar la reproducción directa
                 let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
                 if (match && match[1]) {
                     return `https://docs.google.com/uc?export=download&id=${match[1]}`;
@@ -305,7 +305,6 @@
                 miniHtml = `<img src="${urlLimpia}" alt="Miniatura">`;
             }
 
-            // Mantenemos el botón flotante intacto al renderizar
             const btnHtml = stage.querySelector('#btnModeToggle').outerHTML;
             stage.innerHTML = btnHtml + htmlContent + `<div class="author-tag">📷 ${item.autor}</div>`;
             miniCurrent.innerHTML = miniHtml;
@@ -315,6 +314,9 @@
                 if (videoElement) {
                     videoElement.play().catch(e => console.log("Autoplay prevenido por navegador:", e));
                 }
+            } else {
+                // Si es foto o texto, respetamos el intervalo de tiempo configurado para avanzar
+                if (isPlaying) iniciarLoop();
             }
 
             actualizarColaUI();
@@ -372,7 +374,7 @@
                 let div = document.createElement('div');
                 div.className = 'queue-item';
                 if (filtrados[currentIndex] && filtrados[currentIndex].rowIndex === item.rowIndex) {
-                    div.classList.add('active-item');
+                    div.classList.add('active-log') || div.classList.add('active-item');
                 }
                 div.innerHTML = `<span><b>${item.autor}</b> (${item.tipo})</span> <span style="color:${item.estado==='APROBADO'?'#2bb84b':item.estado==='RECHAZADO'?'#d93838':'#fffd8d'}">${item.estado}</span>`;
                 queueList.appendChild(div);
