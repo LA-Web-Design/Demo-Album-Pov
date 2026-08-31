@@ -384,7 +384,7 @@
                 miniHtml = `<span style="font-size:0.7rem; padding:5px;">${item.detalle}</span>`;
                 if (isPlaying) programarSiguienteSlide(intervaloSlides);
             } else if (item.tipo === 'VIDEO') {
-                htmlContent = `<div class="media-container"><video id="activeVideo" src="${urlLimpia}" autoplay muted playsinline></video></div>`;
+                htmlContent = `<div class="media-container"><video id="activeVideo" src="${urlLimpia}" autoplay muted playsinline preload="auto"></video></div>`;
                 miniHtml = `<video src="${urlLimpia}" muted></video>`;
             } else {
                 htmlContent = `<div class="media-container"><img src="${urlLimpia}" alt="Foto"></div>`;
@@ -399,6 +399,7 @@
             if (item.tipo === 'VIDEO') {
                 const videoElement = document.getElementById('activeVideo');
                 if (videoElement) {
+                    videoElement.load();
                     videoElement.play().catch(e => console.log("Restricción de autoplay en video:", e));
                     
                     videoElement.onended = () => {
