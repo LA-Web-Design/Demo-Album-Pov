@@ -642,36 +642,36 @@
 
             try {
                 let payload = {};
-                const nombresPartes = nombreUsuario.split(" ");
-                const nombreSolo = nombresPartes[0] || "";
-                const apellidoSolo = nombresPartes.slice(1).join(" ") || "";
 
                 if (file.type.startsWith('image/')) {
                     let base64Comprimido = await comprimirImagen(file);
                     payload = {
-                        tipo: 'foto',
-                        file: base64Comprimido,
-                        name: file.name,
+                        accion: "subirContenido",
+                        tipo: 'FOTO',
+                        archivoBase64: base64Comprimido.split(',')[1] || base64Comprimido,
+                        nombreArchivo: file.name,
                         mimeType: 'image/jpeg',
-                        nombre: nombreSolo,
-                        apellido: apellidoSolo
+                        autor: nombreUsuario,
+                        detalle: ''
                     };
                     correctasFotos++;
                 } else if (file.type.startsWith('video/')) {
                     let base64Video = await leerArchivoBase64(file);
                     payload = {
-                        tipo: 'video',
-                        file: base64Video,
-                        name: file.name,
+                        accion: "subirContenido",
+                        tipo: 'VIDEO',
+                        archivoBase64: base64Video.split(',')[1] || base64Video,
+                        nombreArchivo: file.name,
                         mimeType: file.type,
-                        nombre: nombreSolo,
-                        apellido: apellidoSolo
+                        autor: nombreUsuario,
+                        detalle: ''
                     };
                     correctasVideos++;
                 }
 
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
             } catch (err) {
@@ -685,18 +685,20 @@
             statusMsg.innerText = `Enviando mensaje de texto (${actual} de ${totalPasos})...`;
 
             try {
-                const nombresPartes = nombreUsuario.split(" ");
-                const nombreSolo = nombresPartes[0] || "";
-                const apellidoSolo = nombresPartes.slice(1).join(" ") || "";
+                const payloadTexto = {
+                    accion: "subirContenido",
+                    tipo: 'TEXTO',
+                    archivoBase64: '',
+                    nombreArchivo: '',
+                    mimeType: '',
+                    autor: nombreUsuario,
+                    detalle: textoEscrito
+                };
 
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        tipo: 'texto',
-                        contenido: textoEscrito,
-                        nombre: nombreSolo,
-                        apellido: apellidoSolo
-                    })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadTexto)
                 });
                 enviadoTexto = 1;
             } catch (err) {
