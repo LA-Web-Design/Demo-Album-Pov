@@ -75,18 +75,23 @@
         .mini-screen img, .mini-screen video { max-width: 100%; max-height: 100%; object-fit: contain; }
         .mini-screen span { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
 
-        .playback-buttons { display: flex; gap: 6px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
-        .btn-ctrl { background: #3c095c; color: #fff; border: 1px solid rgba(0,212,255,0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+        .playback-buttons { display: flex; gap: 5px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+        .btn-ctrl { background: #3c095c; color: #fff; border: 1px solid rgba(0,212,255,0.3); padding: 5px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
         .btn-ctrl:hover { background: #5a189a; }
         .btn-ctrl.active-play { background: #2bb84b; border-color: #fff; }
+        .btn-ctrl.btn-stop { background: #d93838; }
 
         .moderation-actions { display: flex; gap: 8px; margin-top: 8px; }
         .btn-approve { flex: 1; background: #2bb84b; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .btn-reject { flex: 1; background: #d93838; color: #fff; border: none; padding: 6px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         
-        .queue-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; max-height: 200px; overflow-y: auto; }
+        .queue-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; max-height: 180px; overflow-y: auto; }
         .queue-item { background: #14051c; padding: 8px; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .queue-item.active-item { border-color: #00d4ff; background: #240833; }
+
+        /* Footer integrado para el panel de operador */
+        .footer-divider { width: 100%; height: 2px; background: rgba(0, 0, 0, 0.8); margin: 15px 0 10px 0; }
+        .footer-text { color: #00d4ff; font-size: 0.7rem; text-align: center; line-height: 1.45; opacity: 0.9; }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
@@ -123,10 +128,13 @@
             <div class="mini-card" style="padding: 8px;">
                 <div class="panel-section-title">Controles de Reproducción</div>
                 <div class="playback-buttons">
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">⏮ Anterior</button>
-                    <button class="btn-ctrl" id="btnPlay" onclick="event.stopPropagation(); fijarReproduccion(true)" title="Reproducir">▶ Reproducir</button>
-                    <button class="btn-ctrl" id="btnPause" onclick="event.stopPropagation(); fijarReproduccion(false)" title="Pausar">⏸ Pausar</button>
-                    <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ⏭</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); irAlPrimero()" title="Primero">⏮ Primero</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); retrocederSlide()" title="Anterior">◀ Anterior</button>
+                    <button class="btn-ctrl" id="btnPlay" onclick="event.stopPropagation(); fijarReproduccion(true)" title="Reproducir">▶ Play</button>
+                    <button class="btn-ctrl" id="btnPause" onclick="event.stopPropagation(); fijarReproduccion(false)" title="Pausar">⏸ Pausa</button>
+                    <button class="btn-ctrl btn-stop" onclick="event.stopPropagation(); pararReproduccion()" title="Stop">⏹ Stop</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); avanzarSlideManual()" title="Siguiente">Siguiente ▶</button>
+                    <button class="btn-ctrl" onclick="event.stopPropagation(); irAlUltimo()" title="Último">⏭ Último</button>
                 </div>
             </div>
 
@@ -154,6 +162,10 @@
                 <div class="panel-section-title">Cola de elementos recientes</div>
                 <div class="queue-list" id="queueList"></div>
             </div>
+
+            <!-- Footer incorporado en el panel lateral -->
+            <div class="footer-divider"></div>
+            <div class="footer-text">Diseño de Luis Alberto Cáceres<br>Código de Gemini © 2026</div>
         </div>
     </div>
 
@@ -211,6 +223,15 @@
             } else {
                 clearInterval(timer);
             }
+        }
+
+        function pararReproduccion() {
+            isPlaying = false;
+            clearInterval(timer);
+            actualizarBotoneraPlayPause();
+            const stage = document.getElementById('stageContainer');
+            const btnHtml = stage.querySelector('#btnModeToggle') ? stage.querySelector('#btnModeToggle').outerHTML : '';
+            stage.innerHTML = btnHtml + `<span style="color: rgba(255,255,255,0.4); font-size: 1.2rem;">Reproducción detenida (Stop)</span>`;
         }
 
         function actualizarBotoneraPlayPause() {
@@ -275,6 +296,20 @@
             renderizarPantalla(filtrados[currentIndex]);
         }
 
+        function irAlPrimero() {
+            let filtrados = obtenerElementosAProyectar();
+            if (filtrados.length === 0) return;
+            currentIndex = 0;
+            renderizarPantalla(filtrados[currentIndex]);
+        }
+
+        function irAlUltimo() {
+            let filtrados = obtenerElementosAProyectar();
+            if (filtrados.length === 0) return;
+            currentIndex = filtrados.length - 1;
+            renderizarPantalla(filtrados[currentIndex]);
+        }
+
         function obtenerElementosAProyectar() {
             if (modoModeracion) {
                 return listaContenidos.filter(item => item.estado === 'APROBADO');
@@ -312,10 +347,9 @@
             if (item.tipo === 'VIDEO') {
                 const videoElement = stage.querySelector('video');
                 if (videoElement) {
-                    videoElement.play().catch(e => console.log("Autoplay prevenido por navegador:", e));
+                    videoElement.play().catch(e => console.log("Autoplay con restricciones del navegador:", e));
                 }
             } else {
-                // Si es foto o texto, respetamos el intervalo de tiempo configurado para avanzar
                 if (isPlaying) iniciarLoop();
             }
 
@@ -374,7 +408,7 @@
                 let div = document.createElement('div');
                 div.className = 'queue-item';
                 if (filtrados[currentIndex] && filtrados[currentIndex].rowIndex === item.rowIndex) {
-                    div.classList.add('active-log') || div.classList.add('active-item');
+                    div.classList.add('active-item');
                 }
                 div.innerHTML = `<span><b>${item.autor}</b> (${item.tipo})</span> <span style="color:${item.estado==='APROBADO'?'#2bb84b':item.estado==='RECHAZADO'?'#d93838':'#fffd8d'}">${item.estado}</span>`;
                 queueList.appendChild(div);
